@@ -12,24 +12,26 @@ import string
 import threading
 from termcolor import colored
 
-# wildcard DNS check function
-def wildcard_check(size=8, chars=string.ascii_lowercase + string.digits):
-    return ''.join(random.choice(chars) for i in range(0, size))
+# function to generate a random value which will be used to test for wildcard DNS enteries
+def wildcard_check(domainName, size=8, chars=string.ascii_lowercase + string.digits):
+    return (''.join(random.choice(chars) for i in range(0, size)) + '.' + domainName)
 
-def bruteforce(domain, wordlist):
-    try:
-        for hostname in wordlist:
-            subdomain = (hostname.rstrip('\n') + '.' + domain)
-            result = (dns.resolver.resolve(subdomain))
-            for val in result:
-                print(subdomain + ' has IP address of ' + str(val))
-        return
-    except dns.resolver.NXDOMAIN:
-        pass
-    except dns.resolver.Timeout:
-        pass
-    except dns.exception.DNSException:
-        pass
+# lopp through each line and attempt to resolve the IP address
+# print only valid records
+#def bruteforce(domain, wordlist, checker):
+#    try:
+#        for hostname in wordlist:
+#            subdomain = (hostname.rstrip('\n') + '.' + domain)
+#            result = (dns.resolver.resolve(subdomain))
+#            for val in result:
+#                print(subdomain + ' has IP address of ' + str(val))
+#        return
+#    except dns.resolver.NXDOMAIN:
+#        pass
+#    except dns.resolver.Timeout:
+#        pass
+#    except dns.exception.DNSException:
+#        pass
 
 # create argparse structure
 parser = argparse.ArgumentParser(description='A simple python script to bruteforce subdomains', prog='SubdomainBruteforcer')
@@ -37,11 +39,13 @@ parser.add_argument('-w', '--wordlist', type=argparse.FileType('r'), help='text 
 parser.add_argument('-d', '--domain', help='fully qualified domain name of target domain', type=str)
 args = parser.parse_args()
 
-# generate a check for wildcard DNS enteries
-checker = wildcard_check()
-print(colored('\n[*] using %s.%s as wildcard check' % (checker, args.domain),'green'))
-
-# start the subdomain bruteforce
+# shift the passed arguments into global variables
 fileData = args.wordlist
 domainName = args.domain
-bruteforce(domainName,fileData)
+
+# generate a random value to test for wildcard DNS enteries
+testValue = wildcard_check(domainName)
+print(colored('\n[*] using %s as wildcard check' % (testValue),'green'))
+
+# start the subdomain bruteforce
+#bruteforce(domainName, fileData, testValue)
