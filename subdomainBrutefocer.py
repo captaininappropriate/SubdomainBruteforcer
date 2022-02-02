@@ -26,7 +26,7 @@ def test_for_wildcard_dns(testValue):
                 print(colored('[*] results will be unreliable, exiting...','red'))
                 exit(1)
     except Exception as e:
-        return 0
+        return 1
 
 def bruteforce_subdomain(wordlist, domainName):
     for line in wordlist:
@@ -53,10 +53,10 @@ domainName = args.domain
 testValue = generate_wildcard(domainName)
 
 # check if wildcard DNS is in use
-noDNS = test_for_wildcard_dns(testValue)
+noWildcard = test_for_wildcard_dns(testValue)
 
 # start a subdomain bruteforce
-if not noDNS:
+if noWildcard:
     print(colored('[*] no wildcard DNS recored detected, starting bruteforce','green'))
     bruteforce_subdomain(fileData, domainName)
 
