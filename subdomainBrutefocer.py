@@ -33,9 +33,10 @@ def bruteforce_subdomain(wordlist, domainName):
         try:
             subdomain = (line.rstrip('\n') + '.' + domainName)
             result = (dns.resolver.resolve(subdomain))
-            print(result)
+            for value in result:
+                print('[*] %s ip address %s' % (subdomain, str(value)))
         except Exception as e:
-            print(e)
+            pass
 
 
 # create argparse structure
