@@ -22,7 +22,7 @@ def test_for_wildcard_dns(testValue):
         wildcard = (dns.resolver.resolve(testValue))
         for value in wildcard:
             if value:
-                print(colored('\n[*] wildcard DNS entry exists','red'))
+                print(colored('\n[*] wildcard DNS entry detected','red'))
                 print(colored('[*] results will be unreliable, exiting...','red'))
                 exit(1)
     except Exception as e:
