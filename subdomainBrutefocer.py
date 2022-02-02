@@ -5,6 +5,7 @@
 # Author        : Greg Nimmo
 
 # import required modules
+import os
 import random
 import dns.resolver
 import argparse
@@ -14,34 +15,35 @@ from sys import exit
 from termcolor import colored
 
 # function to generate a random value which will be used to test for wildcard DNS enteries
-def wildcard_check(domainName, size=8, chars=string.ascii_lowercase + string.digits):
+def generate_wildcard(domainName, size=8, chars=string.ascii_lowercase + string.digits):
     return (''.join(random.choice(chars) for i in range(0, size)) + '.' + domainName)
 
-# lopp through each line and attempt to resolve the IP address
-# print only valid records
-def bruteforce(domain, wordlist, testValue):
-
+# test for wildcard DNS enteries and exit program if found
+def test_for_wildcard_dns(testValue):
+    print(colored('\n[*] using %s as wildcard check' % (testValue),'green'))
+    
     try:
         wildcard = (dns.resolver.resolve(testValue))
         if wildcard:
-            print(colored('\n[*] wildcard DNS record detected using %s' % (testValue),'red'))
-            print(colored('[*] results will be unreliable, exiting bruteforce','red'))
-            exit()
+            print(colored('\n[*] wildcard DNS entry detected','red'))
+            print(colored('[*] results will be unreliable, exiting...','red'))
+            sys.exit(1)
     except:
-        print('\n[*]no wildcard detected, commencing bruteforce')
+        print(colored('\n[*] no wildcard detected, starting bruteforce...','green'))
+
+# lopp through each line and attempt to resolve the IP address
+# print only valid records
+def bruteforce(domainName, wordlist):
     try:
         for line in wordlist:
-            subdomain = (line.rstrip('\n') + '.' + domain)
-            print(subdomain)
-            result = (dns.resolver.resolve(subdomain))
+            subdomain = (line.rstrip('\n') + '.' + domainName)
+            result = dns.resolver.resolve(subdomain)
             for value in result:
-                print(subdomain + ' has IP address of ' + str(value))
-    except dns.resolver.NXDOMAIN:
-        pass
-    except dns.resolver.Timeout:
-        pass
-    except dns.exception.DNSException:
-        pass
+                print(value)
+    except Exception as e:
+        print('-----')
+        print(e)
+        print('-----')
 
 # create argparse structure
 parser = argparse.ArgumentParser(description='A simple python script to bruteforce subdomains', prog='SubdomainBruteforcer')
@@ -54,8 +56,10 @@ fileData = args.wordlist
 domainName = args.domain
 
 # generate a random value to test for wildcard DNS enteries
-testValue = wildcard_check(domainName)
-print(colored('\n[*] using %s as wildcard check' % (testValue),'green'))
+testValue = generate_wildcard(domainName)
+
+# check if wildcard DNS is in use
+test_for_wildcard_dns(testValue)
 
 # start a subdomain bruteforce
-bruteforce(domainName, fileData, testValue)
+bruteforce(domainName, fileData)
