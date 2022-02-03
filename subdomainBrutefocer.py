@@ -15,6 +15,7 @@ import dns.resolver
 import argparse 
 import string
 from sys import exit
+from datetime import datetime
 from termcolor import colored
 
 # function to generate a random value which will be used to test for wildcard DNS enteries
@@ -42,12 +43,15 @@ def bruteforce_subdomain(wordlist, domainName):
             subdomain = (line.rstrip('\n') + '.' + domainName)
             result = (dns.resolver.resolve(subdomain))
             for value in result:
-                # placeholder for try except statement to open and save the results to a file
-                #psudo code
-                # try open file in append mode
-                # write current value 
-                # close the file
-                # except if file can't be opened just print to screen
+                # save the data to a text file 
+                try:
+                    with open(dataFile,'a+') as data:
+                        data.write(subdomain + ' ip address ' + str(value) + '\n')
+                        data.close()
+                except Exception as e:
+                    print(colored('[*] an error occured, unable to save data to %s' % dataFile,'red'))
+                    print(e)
+                # output results to the terminal 
                 print('[*] %s ip address %s' % (subdomain, str(value)))
         except Exception as e:
             pass
@@ -59,9 +63,13 @@ parser.add_argument('-w', '--wordlist', type=argparse.FileType('r'), help='text 
 parser.add_argument('-d', '--domain', help='fully qualified domain name of target domain', type=str)
 args = parser.parse_args()
 
-# some nicer looking global variables for supplied arguments
+# easier to work with variables for supplied arguments
 fileData = args.wordlist
 domainName = args.domain
+
+# variables for saving bruteforce data
+current_date = datetime.now().date() 
+dataFile = (domainName + '_' + str(current_date))
 
 # call to generate a random value to test for wildcard DNS enteries
 testValue = generate_wildcard(domainName)
