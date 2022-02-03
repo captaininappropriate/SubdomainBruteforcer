@@ -4,9 +4,8 @@
 #                 from a user supplied file containing one hostname per line
 # Usage         : use --help for complete details. 
 #                 TLDR; supply a file containing subdomains (-w) and a target domain (-d) name
-# Version       : 1.0
+# Version       : 1.1
 # Author        : Greg Nimmo
-# TODO          : Add a routine to save the subdomains identified as valid to a text file
 
 
 # import required modules
